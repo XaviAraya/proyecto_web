@@ -6,6 +6,7 @@ import methodOverride from 'method-override';
 import { engine } from 'express-handlebars';
 
 import authRoutes from './routes/auth.routes';
+import proyectoRoutes from './routes/proyecto.routes';
 
 const app = express();
 
@@ -37,12 +38,22 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(methodOverride('_method'));
+app.use(
+  methodOverride((req) => {
+    if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+      const method = (req.body as Record<string, unknown>)._method;
+      delete (req.body as Record<string, unknown>)._method;
+      return method as string;
+    }
+    return req.method;
+  }),
+);
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.get('/', (_req, res) => res.redirect('/proyectos'));
 
 app.use('/', authRoutes);
+app.use('/proyectos', proyectoRoutes);
 
 app.use((_req, res) => {
   res.status(404).send('Página no encontrada');

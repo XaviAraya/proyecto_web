@@ -1,0 +1,38 @@
+<div class="max-w-lg mx-auto bg-white rounded-xl shadow border border-gray-100 p-6">
+  <h1 class="text-xl font-bold text-slate-800 mb-4">Editar proyecto</h1>
+  <form method="POST" action="/proyectos/{{proyecto.id}}" class="space-y-4">
+    <input type="hidden" name="_method" value="PUT" />
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Nombre</label>
+      <input type="text" name="nombre" value="{{proyecto.nombre}}" required class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Fecha de inicio</label>
+      <input type="date" name="fecha_inicio" value="{{proyecto.fecha_inicio}}" required class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Estado</label>
+      <select name="estado" required class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500">
+        <option value="pendiente" {{#if (eq proyecto.estado 'pendiente')}}selected{{/if}}>pendiente</option>
+        <option value="en curso" {{#if (eq proyecto.estado 'en curso')}}selected{{/if}}>en curso</option>
+        <option value="finalizado" {{#if (eq proyecto.estado 'finalizado')}}selected{{/if}}>finalizado</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Responsable</label>
+      <input type="text" name="responsable" value="{{proyecto.responsable}}" required class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Monto ($ CLP)</label>
+      <input type="number" name="monto" value="{{proyecto.monto}}" min="0" step="1" required class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" />
+    </div>
+    <div class="flex gap-3 pt-2">
+      <button type="submit" class="flex-1 bg-slate-900 text-white rounded py-2 font-medium hover:bg-slate-700 transition">
+        Guardar cambios
+      </button>
+      <a href="/proyectos/{{proyecto.id}}" class="px-4 py-2 text-sm text-slate-600 hover:text-slate-900 self-center">
+        Cancelar
+      </a>
+    </div>
+  </form>
+</div>

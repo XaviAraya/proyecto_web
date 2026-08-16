@@ -1,0 +1,37 @@
+<div class="max-w-lg mx-auto bg-white rounded-xl shadow border border-gray-100 p-6 space-y-4">
+  <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+    <h1 class="text-xl font-bold text-slate-800">{{proyecto.nombre}}</h1>
+    <span class="px-2.5 py-1 rounded-full text-xs font-medium
+      {{#if (eq proyecto.estado 'finalizado')}}bg-emerald-100 text-emerald-800
+      {{else}}{{#if (eq proyecto.estado 'en curso')}}bg-blue-100 text-blue-800
+      {{else}}bg-amber-100 text-amber-800{{/if}}{{/if}}">
+      {{proyecto.estado}}
+    </span>
+  </div>
+
+  <dl class="grid grid-cols-2 gap-y-3 text-sm">
+    <dt class="text-slate-500 font-medium">Fecha de inicio</dt>
+    <dd class="text-slate-900">{{formatFecha proyecto.fecha_inicio}}</dd>
+
+    <dt class="text-slate-500 font-medium">Responsable</dt>
+    <dd class="text-slate-900">{{proyecto.responsable}}</dd>
+
+    <dt class="text-slate-500 font-medium">Monto</dt>
+    <dd class="text-slate-900 font-semibold">${{formatMonto proyecto.monto}}</dd>
+
+    <dt class="text-slate-500 font-medium">Creado por</dt>
+    <dd class="text-slate-900">{{creadorNombre}}</dd>
+  </dl>
+
+  <div class="flex items-center gap-4 pt-4 border-t border-gray-100">
+    <a href="/proyectos/{{proyecto.id}}/editar" class="text-amber-600 font-medium hover:underline text-sm">
+      Editar
+    </a>
+    <a href="/proyectos/{{proyecto.id}}/eliminar" class="text-red-600 font-medium hover:underline text-sm">
+      Eliminar
+    </a>
+    <a href="/proyectos" class="text-slate-500 hover:text-slate-700 text-sm ml-auto">
+      ← Volver al listado
+    </a>
+  </div>
+</div>

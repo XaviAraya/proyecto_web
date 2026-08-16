@@ -1,0 +1,61 @@
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-800">Proyectos</h1>
+    <p class="text-sm text-slate-500">Gestión y seguimiento de proyectos</p>
+  </div>
+  {{> uf-widget uf=uf}}
+</div>
+
+{{#if error}}
+  <div class="mb-4 rounded bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">{{error}}</div>
+{{/if}}
+
+<div class="mb-6 flex justify-between items-center">
+  <a href="/proyectos/nuevo" class="inline-flex items-center gap-1 bg-slate-900 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-slate-700 shadow-sm transition">
+    <span>+</span> Nuevo proyecto
+  </a>
+</div>
+
+<div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+  <table class="min-w-full divide-y divide-gray-200 text-sm">
+    <thead class="bg-slate-50 text-slate-600 font-semibold">
+      <tr>
+        <th class="px-5 py-3 text-left">Nombre</th>
+        <th class="px-5 py-3 text-left">Inicio</th>
+        <th class="px-5 py-3 text-left">Estado</th>
+        <th class="px-5 py-3 text-left">Responsable</th>
+        <th class="px-5 py-3 text-left">Monto</th>
+        <th class="px-5 py-3 text-right">Acciones</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-100">
+      {{#each proyectos}}
+      <tr class="hover:bg-slate-50/50 transition">
+        <td class="px-5 py-3 font-medium text-slate-900">{{this.nombre}}</td>
+        <td class="px-5 py-3 text-slate-600">{{formatFecha this.fecha_inicio}}</td>
+        <td class="px-5 py-3">
+          <span class="px-2.5 py-1 rounded-full text-xs font-medium
+            {{#if (eq this.estado 'finalizado')}}bg-emerald-100 text-emerald-800
+            {{else}}{{#if (eq this.estado 'en curso')}}bg-blue-100 text-blue-800
+            {{else}}bg-amber-100 text-amber-800{{/if}}{{/if}}">
+            {{this.estado}}
+          </span>
+        </td>
+        <td class="px-5 py-3 text-slate-600">{{this.responsable}}</td>
+        <td class="px-5 py-3 font-medium text-slate-900">${{formatMonto this.monto}}</td>
+        <td class="px-5 py-3 text-right space-x-3 text-sm">
+          <a href="/proyectos/{{this.id}}" class="text-blue-600 font-medium hover:underline">Ver</a>
+          <a href="/proyectos/{{this.id}}/editar" class="text-amber-600 font-medium hover:underline">Editar</a>
+          <a href="/proyectos/{{this.id}}/eliminar" class="text-red-600 font-medium hover:underline">Eliminar</a>
+        </td>
+      </tr>
+      {{else}}
+      <tr>
+        <td colspan="6" class="px-5 py-8 text-center text-slate-500">
+          No hay proyectos registrados actualmente.
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
