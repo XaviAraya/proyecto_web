@@ -1,4 +1,4 @@
-# 🚀 Tech Solutions — Sistema de Gestión de Proyectos
+# Tech Solutions — Sistema de Gestión de Proyectos
 
 Sistema web desarrollado bajo el patrón de arquitectura **MVC** con **Node.js**, **TypeScript**, **Express**, **Handlebars** y **Tailwind CSS**.
 
@@ -6,33 +6,34 @@ El proyecto integra gestión de proyectos, consulta de servicios externos en tie
 
 ---
 
-## 📋 Tabla de Contenidos
+## Tabla de Contenidos
 
-- [Características Principales](#-características-principales)
-- [Stack Tecnológico](#-stack-tecnológico)
-- [Estructura del Proyecto](#-estructura-del-proyecto)
-- [Requisitos Previos](#-requisitos-previos)
-- [Instalación y Configuración](#-instalación-y-configuración)
-- [Comandos Disponibles](#-comandos-disponibles)
-- [Guía de Uso Rápido](#-guía-de-uso-rápido)
-- [Consideraciones de Seguridad](#-consideraciones-de-seguridad)
+- [Características Principales](#características-principales)
+- [Stack Tecnológico](#stack-tecnológico)
+- [Estructura del Proyecto](#estructura-del-proyecto)
+- [Requisitos Previos](#requisitos-previos)
+- [Instalación y Configuración](#instalación-y-configuración)
+- [Comandos Disponibles](#comandos-disponibles)
+- [Guía de Uso Rápido](#guía-de-uso-rápido)
+- [Consideraciones de Seguridad](#consideraciones-de-seguridad)
+- [Licencia](#licencia)
 
 ---
 
-## ✨ Características Principales
+## Características Principales
 
-### 1. 📊 Módulo de Proyectos (CRUD)
+### 1. Módulo de Proyectos (CRUD)
 - **Listar Proyectos:** Tabla interactiva con estados clasificados por colores (*pendiente*, *en curso*, *finalizado*), montos formateados en moneda nacional y acciones directas.
 - **Crear Proyecto:** Formulario con asignación automática del usuario creador (`created_by`) derivado del token de sesión.
 - **Detalle de Proyecto:** Información completa del proyecto, incluyendo el nombre del usuario responsable y del creador.
 - **Editar y Eliminar:** Edición y borrado de proyectos mediante formularios HTML estándar utilizando `method-override` para los verbos HTTP `PUT` y `DELETE`.
 
-### 2. 🇨🇱 Componente Reutilizable: Widget UF
+### 2. Componente Reutilizable: Widget UF
 - Consulta en tiempo real el valor diario de la Unidad de Fomento (UF) desde la API pública de [`mindicador.cl`](https://mindicador.cl).
 - Componente de dos capas: servicio desacoplado (`uf.service.ts`) + vista reutilizable (`views/partials/uf-widget.hbs`).
 - Manejo resiliente de errores ante caídas de red o falta de conexión.
 
-### 3. 🔐 Módulo de Autenticación & Seguridad
+### 3. Módulo de Autenticación y Seguridad
 - **Registro y Login:** Formulario de registro con contraseñas cifradas unidireccionalmente mediante `bcryptjs` (salt rounds = 10).
 - **Manejo de Sesión sin Estado:** Tokens JWT firmados almacenados en cookies seguras con atributo `httpOnly`.
 - **Protección de Rutas:** Middleware `verificarToken` que resguarda todas las rutas bajo `/proyectos/*` y redirige a `/login` en caso de sesión inválida o ausente.
@@ -40,7 +41,7 @@ El proyecto integra gestión de proyectos, consulta de servicios externos en tie
 
 ---
 
-## 🛠 Stack Tecnológico
+## Stack Tecnológico
 
 | Capa / Herramienta | Tecnología / Paquete | Propósito |
 |---|---|---|
@@ -56,7 +57,7 @@ El proyecto integra gestión de proyectos, consulta de servicios externos en tie
 
 ---
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```text
 proyecto_web/
@@ -112,14 +113,14 @@ proyecto_web/
 
 ---
 
-## 📦 Requisitos Previos
+## Requisitos Previos
 
 - **Node.js:** Versión 18 o superior (recomendado Node.js 20 LTS).
 - **pnpm:** Versión 9 o superior (`npm install -g pnpm`).
 
 ---
 
-## ⚙️ Instalación y Configuración
+## Instalación y Configuración
 
 1. **Clonar el repositorio o ingresar al directorio:**
    ```bash
@@ -152,7 +153,7 @@ proyecto_web/
 
 ---
 
-## ⚡ Comandos Disponibles
+## Comandos Disponibles
 
 | Comando | Descripción |
 |---|---|
@@ -166,7 +167,7 @@ proyecto_web/
 
 ---
 
-## 🚦 Guía de Uso Rápido
+## Guía de Uso Rápido
 
 > **Nota sobre persistencia:** En esta etapa académica, los datos se almacenan en arreglos en memoria.
 
@@ -187,7 +188,7 @@ proyecto_web/
 
 ---
 
-## 🛡️ Consideraciones de Seguridad
+## Consideraciones de Seguridad
 
 - **Protección de Credenciales:** La contraseña ingresada nunca se almacena en texto plano; se cifra con un hash seguro de `bcrypt`. Tampoco se envía ni renderiza en ninguna vista o respuesta.
 - **Cookies Seguras (`httpOnly`):** El token JWT reside en una cookie inaccesible para scripts del lado del cliente (`document.cookie`), protegiendo la sesión ante ataques XSS.
@@ -196,6 +197,6 @@ proyecto_web/
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 Proyecto académico desarrollado para **Tech Solutions**.
