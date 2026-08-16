@@ -1,0 +1,25 @@
+<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
+  <h1 class="text-xl font-bold mb-4">Iniciar sesión</h1>
+
+  {{#if error}}
+    <div class="mb-4 rounded bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-sm">{{error}}</div>
+  {{/if}}
+
+  <form method="POST" action="/login" class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Correo</label>
+      <input type="email" name="correo" required class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Clave</label>
+      <input type="password" name="clave" required class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" />
+    </div>
+    <button type="submit" class="w-full bg-slate-900 text-white rounded py-2 font-medium hover:bg-slate-700 transition">
+      Ingresar
+    </button>
+  </form>
+
+  <p class="mt-4 text-sm text-gray-600 text-center">
+    ¿No tienes cuenta? <a href="/registro" class="text-emerald-600 font-medium hover:underline">Regístrate</a>
+  </p>
+</div>

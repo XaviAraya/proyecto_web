@@ -1,4 +1,7 @@
-import 'dotenv/config';
+import app from './app';
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
-console.log(`Placeholder server.ts — PORT configurado en ${PORT}`);
+
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en http://localhost:${PORT}`);
+});
