@@ -31,6 +31,8 @@ El sistema integra dos componentes funcionales principales:
 | **ORM / Base de Datos** | `Prisma` (v7.x) + `PostgreSQL` | Cliente generado en `src/generated/prisma` (gitignored). Prisma 7 usa **driver adapters**: `@prisma/adapter-pg` + `pg`, no lee `DATABASE_URL` automáticamente. |
 | **Contenedores** | `Docker` + `docker compose` | `Dockerfile` (imagen de la app) + `docker-compose.yml` (servicios `app` y `db`). |
 
+**Justificación:** Express + Handlebars (SSR) evita la complejidad de un frontend SPA para un CRUD con auth; TypeScript da seguridad de tipos; Prisma + PostgreSQL + Docker dan persistencia real y un entorno reproducible con un solo comando. Trade-off aceptado: al ser SSR, cada acción recarga la página completa (sin actualizaciones parciales sin JS extra) — correcto para el alcance actual. Si se requiere UX más dinámica, evaluar algo ligero (HTMX, `fetch` + fragmentos) antes de introducir un framework SPA — **no** agregar uno sin que el brief lo pida explícitamente.
+
 ---
 
 ## 📂 3. Estructura de Directorios

@@ -57,6 +57,12 @@ El proyecto integra gestión de proyectos, consulta de servicios externos en tie
 | **ORM / Base de Datos** | [Prisma](https://www.prisma.io/) (v7.x) + **PostgreSQL** | Persistencia real de `Usuario` y `Proyecto`, migraciones versionadas en `prisma/migrations`. |
 | **Contenedores** | Docker + Docker Compose | Servicios `app` (Node) y `db` (PostgreSQL) orquestados con `docker-compose.yml`. |
 
+### ¿Por qué este stack?
+
+Es un stack coherente para un CRUD con autenticación: Express + Handlebars (SSR) evita la complejidad de un frontend SPA, TypeScript da seguridad de tipos, y Prisma + PostgreSQL + Docker aportan persistencia real y un entorno reproducible con un solo comando — piezas maduras y bien documentadas, sin nada exótico.
+
+**Trade-off principal:** al ser SSR con Handlebars, cada acción (crear, editar, eliminar) recarga la página completa; no hay actualizaciones parciales sin JavaScript adicional. Para el alcance de este proyecto (CRUD + auth) es una ventaja de simplicidad, no una limitación. Si en el futuro se necesita UX más dinámica, conviene evaluar algo ligero como HTMX o `fetch` + fragmentos antes de saltar a un framework SPA completo.
+
 ---
 
 ## Estructura del Proyecto
