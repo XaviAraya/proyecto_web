@@ -1,24 +1,18 @@
+import { prisma } from '../config/db';
 import { IUsuario } from '../types/usuario';
 
-const usuarios: IUsuario[] = [];
-let nextId = 1;
-
-export function findAll(): IUsuario[] {
-  return usuarios;
+export function findAll(): Promise<IUsuario[]> {
+  return prisma.usuario.findMany();
 }
 
-export function findByCorreo(correo: string): IUsuario | undefined {
-  return usuarios.find((u) => u.correo === correo);
+export function findByCorreo(correo: string): Promise<IUsuario | null> {
+  return prisma.usuario.findUnique({ where: { correo } });
 }
 
-export function findById(id: number): IUsuario | undefined {
-  return usuarios.find((u) => u.id === id);
+export function findById(id: number): Promise<IUsuario | null> {
+  return prisma.usuario.findUnique({ where: { id } });
 }
 
-export function create(data: Omit<IUsuario, 'id'>): IUsuario {
-  const usuario: IUsuario = { id: nextId++, ...data };
-  usuarios.push(usuario);
-  return usuario;
+export function create(data: Omit<IUsuario, 'id'>): Promise<IUsuario> {
+  return prisma.usuario.create({ data });
 }
-
-export default usuarios;

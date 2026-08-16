@@ -1,37 +1,44 @@
+import { Prisma } from '../generated/prisma/client';
+import { prisma } from '../config/db';
 import { IProyecto } from '../types/proyecto';
 
-const proyectos: IProyecto[] = [];
-let nextId = 1;
-
-export function findAll(): IProyecto[] {
-  return proyectos;
+function isNotFoundError(error: unknown): boolean {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === 'P2025'
+  );
 }
 
-export function findById(id: number): IProyecto | undefined {
-  return proyectos.find((p) => p.id === id);
+export function findAll(): Promise<IProyecto[]> {
+  return prisma.proyecto.findMany();
 }
 
-export function create(data: Omit<IProyecto, 'id'>): IProyecto {
-  const proyecto: IProyecto = { id: nextId++, ...data };
-  proyectos.push(proyecto);
-  return proyecto;
+export function findById(id: number): Promise<IProyecto | null> {
+  return prisma.proyecto.findUnique({ where: { id } });
 }
 
-export function update(
+export function create(data: Omit<IProyecto, 'id'>): Promise<IProyecto> {
+  return prisma.proyecto.create({ data });
+}
+
+export async function update(
   id: number,
   data: Partial<Omit<IProyecto, 'id' | 'created_by'>>,
-): IProyecto | undefined {
-  const proyecto = findById(id);
-  if (!proyecto) return undefined;
-  Object.assign(proyecto, data);
-  return proyecto;
+): Promise<IProyecto | undefined> {
+  try {
+    return await prisma.proyecto.update({ where: { id }, data });
+  } catch (error) {
+    if (isNotFoundError(error)) return undefined;
+    throw error;
+  }
 }
 
-export function remove(id: number): boolean {
-  const idx = proyectos.findIndex((p) => p.id === id);
-  if (idx === -1) return false;
-  proyectos.splice(idx, 1);
-  return true;
+export async function remove(id: number): Promise<boolean> {
+  try {
+    await prisma.proyecto.delete({ where: { id } });
+    return true;
+  } catch (error) {
+    if (isNotFoundError(error)) return false;
+    throw error;
+  }
 }
-
-export default proyectos;

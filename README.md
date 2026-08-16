@@ -54,6 +54,8 @@ El proyecto integra gestión de proyectos, consulta de servicios externos en tie
 | **Cookies** | `cookie-parser` | Parseo y lectura de cookies `httpOnly`. |
 | **Soporte HTTP Verbs** | `method-override` | Soporte de verbos `PUT` y `DELETE` desde formularios HTML. |
 | **Entorno** | `dotenv` | Gestión de variables de entorno locales. |
+| **ORM / Base de Datos** | [Prisma](https://www.prisma.io/) (v7.x) + **PostgreSQL** | Persistencia real de `Usuario` y `Proyecto`, migraciones versionadas en `prisma/migrations`. |
+| **Contenedores** | Docker + Docker Compose | Servicios `app` (Node) y `db` (PostgreSQL) orquestados con `docker-compose.yml`. |
 
 ---
 
@@ -61,21 +63,28 @@ El proyecto integra gestión de proyectos, consulta de servicios externos en tie
 
 ```text
 proyecto_web/
+├── Dockerfile                   # Imagen de la app: install → prisma generate → build → migrate deploy + start
+├── docker-compose.yml           # Servicios `app` (Node) y `db` (postgres:16-alpine)
+├── prisma/
+│   ├── schema.prisma            # Modelos Usuario y Proyecto (Prisma ORM)
+│   └── migrations/              # Historial de migraciones SQL versionado
 ├── public/
 │   └── css/
 │       └── styles.css          # CSS compilado por Tailwind (generado)
 ├── dist/                       # Salida compilada a JavaScript para producción
 ├── src/
 │   ├── config/
-│   │   └── db.ts               # Configuración de base de datos (preparado para fase futura)
+│   │   └── db.ts               # Instancia única de PrismaClient (driver adapter @prisma/adapter-pg)
+│   ├── generated/
+│   │   └── prisma/             # Cliente de Prisma generado (gitignored)
 │   ├── controllers/
 │   │   ├── auth.controller.ts  # Controladores de registro, login y logout
 │   │   └── proyecto.controller.ts # Controladores del CRUD de proyectos
 │   ├── middlewares/
 │   │   └── auth.middleware.ts  # Middleware verificarToken (JWT en cookie/header)
 │   ├── models/
-│   │   ├── usuario.model.ts    # Modelo en memoria para usuarios (IUsuario[])
-│   │   └── proyecto.model.ts   # Modelo en memoria para proyectos (IProyecto[])
+│   │   ├── usuario.model.ts    # CRUD async sobre `prisma.usuario`
+│   │   └── proyecto.model.ts   # CRUD async sobre `prisma.proyecto`
 │   ├── routes/
 │   │   ├── auth.routes.ts      # Rutas públicas (/registro, /login, /logout)
 │   │   └── proyecto.routes.ts  # Rutas protegidas (/proyectos/*)
@@ -115,40 +124,57 @@ proyecto_web/
 
 ## Requisitos Previos
 
-- **Node.js:** Versión 18 o superior (recomendado Node.js 20 LTS).
-- **pnpm:** Versión 9 o superior (`npm install -g pnpm`).
+- **Node.js:** Versión 18 o superior (recomendado Node.js 20 LTS) — solo si se ejecuta fuera de Docker.
+- **pnpm:** Versión 9 o superior (`npm install -g pnpm`) — solo si se ejecuta fuera de Docker.
+- **Docker + Docker Compose:** Forma recomendada de correr la aplicación completa (app + PostgreSQL) sin instalar nada más.
 
 ---
 
 ## Instalación y Configuración
 
-1. **Clonar el repositorio o ingresar al directorio:**
+### Opción A: Con Docker (recomendada)
+
+1. **Ingresar al directorio del proyecto y configurar las variables de entorno:**
    ```bash
    cd proyecto_web
+   cp .env.example .env
    ```
 
-2. **Instalar las dependencias con `pnpm`:**
+   El `.env` contendrá:
+   ```env
+   DATABASE_URL="postgresql://postgres:desarrollo_software_1@localhost:5432/desarrollo_software_1?schema=public"
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=desarrollo_software_1
+   POSTGRES_DB=desarrollo_software_1
+   JWT_SECRET=definir_una_clave_secreta_fuerte
+   JWT_EXPIRES_IN=1h
+   UF_API_URL=https://mindicador.cl/api/uf
+   PORT=3000
+   ```
+
+2. **Levantar la app y PostgreSQL con un solo comando:**
+   ```bash
+   docker compose up -d --build
+   ```
+   El contenedor `app` aplica automáticamente las migraciones (`prisma migrate deploy`) antes de arrancar el servidor. La app queda disponible en [`http://localhost:3000`](http://localhost:3000).
+
+### Opción B: Local (sin Docker)
+
+1. **Instalar las dependencias con `pnpm`:**
    ```bash
    pnpm install
    ```
 
-3. **Configurar las variables de entorno:**
-   Copia el archivo de plantilla `.env.example` a `.env`:
+2. **Configurar `.env`** (como en la Opción A), apuntando `DATABASE_URL` a un PostgreSQL accesible (por ejemplo, levantando solo la base con `docker compose up -d db`).
+
+3. **Aplicar las migraciones:**
    ```bash
-   cp .env.example .env
+   npx prisma migrate deploy
    ```
 
-   El archivo `.env` contendrá los valores por defecto:
-   ```env
-   PORT=3000
-   JWT_SECRET=definir_una_clave_secreta_fuerte
-   JWT_EXPIRES_IN=1h
-   UF_API_URL=https://mindicador.cl/api/uf
-   DB_HOST=localhost
-   DB_PORT=3306
-   DB_USER=root
-   DB_PASSWORD=desarrollo_software_1
-   DB_NAME=desarrollo_software_1
+4. **Levantar el servidor de desarrollo:**
+   ```bash
+   pnpm dev
    ```
 
 ---
@@ -164,17 +190,24 @@ proyecto_web/
 | `pnpm build` | Compila CSS, transpila TypeScript a `dist/` y copia las plantillas `.hbs` a `dist/views`. |
 | `pnpm start` | Inicia la aplicación en **modo producción** desde `dist/server.js`. |
 | `pnpm exec tsc --noEmit` | Ejecuta el chequeo estático de tipos sin compilar archivos. |
+| `npx prisma migrate dev --name <nombre>` | Crea y aplica una nueva migración en desarrollo. |
+| `npx prisma migrate deploy` | Aplica migraciones pendientes sin generar nuevas (usado en el arranque del contenedor). |
+| `npx prisma generate` | Regenera el cliente de Prisma tras cambiar `schema.prisma`. |
+| `docker compose up -d --build` | Construye y levanta la app + PostgreSQL completos. |
+| `docker compose logs -f app` | Sigue los logs del servidor dentro del contenedor. |
+| `docker compose down` | Detiene los contenedores (los datos persisten en el volumen `pgdata`). |
 
 ---
 
 ## Guía de Uso Rápido
 
-> **Nota sobre persistencia:** En esta etapa académica, los datos se almacenan en arreglos en memoria.
+> **Nota sobre persistencia:** Los datos se almacenan en PostgreSQL vía Prisma ORM, no en memoria.
 
-1. **Iniciar el entorno de desarrollo:**
+1. **Iniciar el entorno (con Docker):**
    ```bash
-   pnpm dev
+   docker compose up -d --build
    ```
+   O en modo desarrollo local: `pnpm dev` (requiere `DATABASE_URL` apuntando a una DB accesible).
 2. **Abrir en el navegador:**
    Ingresa a [`http://localhost:3000`](http://localhost:3000). El sistema te redirigirá a `/proyectos` y luego a `/login` al no detectar una sesión activa.
 3. **Crear una cuenta:**

@@ -8,15 +8,15 @@ export function mostrarFormularioCreacion(_req: Request, res: Response): void {
 }
 
 export async function listarProyectos(_req: Request, res: Response): Promise<void> {
-  const proyectos = ProyectoModel.findAll();
+  const proyectos = await ProyectoModel.findAll();
   const uf = await obtenerUF();
   res.render('proyectos/listar', { proyectos, uf });
 }
 
-export function crearProyecto(req: Request, res: Response): void {
+export async function crearProyecto(req: Request, res: Response): Promise<void> {
   const { nombre, fecha_inicio, estado, responsable, monto } = req.body as Record<string, string>;
 
-  ProyectoModel.create({
+  await ProyectoModel.create({
     nombre,
     fecha_inicio,
     estado,
@@ -28,28 +28,28 @@ export function crearProyecto(req: Request, res: Response): void {
   res.redirect('/proyectos');
 }
 
-export function obtenerProyectoPorId(req: Request, res: Response): void {
+export async function obtenerProyectoPorId(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id);
-  const proyecto = ProyectoModel.findById(id);
+  const proyecto = await ProyectoModel.findById(id);
 
   if (!proyecto) {
     res.status(404).render('proyectos/listar', {
-      proyectos: ProyectoModel.findAll(),
+      proyectos: await ProyectoModel.findAll(),
       error: 'Proyecto no encontrado.',
     });
     return;
   }
 
-  const creador = UsuarioModel.findById(proyecto.created_by);
+  const creador = await UsuarioModel.findById(proyecto.created_by);
   res.render('proyectos/detalle', {
     proyecto,
     creadorNombre: creador ? creador.nombre : `Usuario #${proyecto.created_by}`,
   });
 }
 
-export function mostrarFormularioEdicion(req: Request, res: Response): void {
+export async function mostrarFormularioEdicion(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id);
-  const proyecto = ProyectoModel.findById(id);
+  const proyecto = await ProyectoModel.findById(id);
 
   if (!proyecto) {
     res.redirect('/proyectos');
@@ -59,11 +59,11 @@ export function mostrarFormularioEdicion(req: Request, res: Response): void {
   res.render('proyectos/editar', { proyecto });
 }
 
-export function actualizarProyecto(req: Request, res: Response): void {
+export async function actualizarProyecto(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id);
   const { nombre, fecha_inicio, estado, responsable, monto } = req.body as Record<string, string>;
 
-  const actualizado = ProyectoModel.update(id, {
+  const actualizado = await ProyectoModel.update(id, {
     nombre,
     fecha_inicio,
     estado,
@@ -79,9 +79,9 @@ export function actualizarProyecto(req: Request, res: Response): void {
   res.redirect(`/proyectos/${id}`);
 }
 
-export function mostrarConfirmacionEliminar(req: Request, res: Response): void {
+export async function mostrarConfirmacionEliminar(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id);
-  const proyecto = ProyectoModel.findById(id);
+  const proyecto = await ProyectoModel.findById(id);
 
   if (!proyecto) {
     res.redirect('/proyectos');
@@ -91,8 +91,8 @@ export function mostrarConfirmacionEliminar(req: Request, res: Response): void {
   res.render('proyectos/eliminar', { proyecto });
 }
 
-export function eliminarProyecto(req: Request, res: Response): void {
+export async function eliminarProyecto(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id);
-  ProyectoModel.remove(id);
+  await ProyectoModel.remove(id);
   res.redirect('/proyectos');
 }
