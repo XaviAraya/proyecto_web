@@ -30,8 +30,9 @@ El sistema integra dos componentes funcionales principales:
 | **Variables de Entorno** | `dotenv` | Configuradas en `.env` (ignorado en git), plantilla en `.env.example`. |
 | **ORM / Base de Datos** | `Prisma` (v7.x) + `PostgreSQL` | Cliente generado en `src/generated/prisma` (gitignored). Prisma 7 usa **driver adapters**: `@prisma/adapter-pg` + `pg`, no lee `DATABASE_URL` automáticamente. |
 | **Contenedores** | `Docker` + `docker compose` | `Dockerfile` (imagen de la app) + `docker-compose.yml` (servicios `app` y `db`). |
+| **Interactividad Cliente** | `Alpine.js` (v3.x) | Auto-hospedado (`public/js/alpine.min.js`, copiado por `pnpm build:js`, sin CDN). Uso mínimo y deliberado: menú móvil y auto-cierre de alertas. **No** contiene lógica de negocio — eso vive en el backend. |
 
-**Justificación:** Express + Handlebars (SSR) evita la complejidad de un frontend SPA para un CRUD con auth; TypeScript da seguridad de tipos; Prisma + PostgreSQL + Docker dan persistencia real y un entorno reproducible con un solo comando. Trade-off aceptado: al ser SSR, cada acción recarga la página completa (sin actualizaciones parciales sin JS extra) — correcto para el alcance actual. Si se requiere UX más dinámica, evaluar algo ligero (HTMX, `fetch` + fragmentos) antes de introducir un framework SPA — **no** agregar uno sin que el brief lo pida explícitamente.
+**Justificación:** Express + Handlebars (SSR) evita la complejidad de un frontend SPA para un CRUD con auth; TypeScript da seguridad de tipos; Prisma + PostgreSQL + Docker dan persistencia real y un entorno reproducible con un solo comando. Trade-off aceptado: al ser SSR, cada acción recarga la página completa. Para las pocas interacciones que sí lo requerían (menú móvil, alertas auto-descartables) se agregó Alpine.js de forma mínima en vez de saltar a un framework SPA — **no** agregar uno nuevo sin que el brief lo pida explícitamente; extender el uso de Alpine solo para interacciones puntuales de UI, nunca para lógica de negocio.
 
 ---
 
@@ -55,11 +56,12 @@ El sistema integra dos componentes funcionales principales:
 ├── prisma.config.ts           # Config del CLI de Prisma (lee DATABASE_URL vía dotenv)
 ├── Docs/
 │   └── BRIEF.md               # Especificación funcional y de negocio original
-├── PLAN.md                    # Plan de implementación paso a paso verificado
 ├── AGENTS.md                  # Este documento de contexto para agentes
 ├── public/
-│   └── css/
-│       └── styles.css         # CSS compilado por Tailwind (NO editar manualmente)
+│   ├── css/
+│   │   └── styles.css         # CSS compilado por Tailwind (NO editar manualmente)
+│   └── js/
+│       └── alpine.min.js      # Alpine.js vendorizado por `pnpm build:js` (NO editar manualmente)
 ├── dist/                      # Código compilado a JS y vistas para producción (generado)
 └── src/
     ├── app.ts                 # Configuración de Express, Handlebars, Middlewares y Rutas
@@ -76,7 +78,7 @@ El sistema integra dos componentes funcionales principales:
     │   ├── usuario.model.ts   # CRUD async sobre `prisma.usuario`
     │   └── proyecto.model.ts  # CRUD async sobre `prisma.proyecto`
     ├── middlewares/
-    │   └── auth.middleware.ts # verificarToken: valida JWT en cookie o header Bearer
+    │   └── auth.middleware.ts # verificarToken (protege rutas) + cargarUsuario (expone sesión a res.locals sin forzar auth, para el nav)
     ├── services/
     │   └── uf.service.ts      # Servicio tipado para consultar mindicador.cl/api/uf
     ├── controllers/
@@ -86,12 +88,13 @@ El sistema integra dos componentes funcionales principales:
     │   ├── auth.routes.ts     # /registro, /login, /logout
     │   └── proyecto.routes.ts # /proyectos, /proyectos/nuevo, /proyectos/:id, etc.
     ├── styles/
-    │   └── input.css          # Directivas @tailwind base, components, utilities
+    │   └── input.css          # @tailwind base/components/utilities + @layer components (.btn-primary, .card, .badge, .input-field...)
     └── views/
         ├── layouts/
-        │   └── main.hbs       # Layout base HTML5 con header, nav y footer
+        │   └── main.hbs       # Layout base HTML5: header con nav responsivo (menú móvil vía Alpine.js) y footer
         ├── partials/
-        │   └── uf-widget.hbs  # Widget badge que renderiza el valor de la UF
+        │   ├── uf-widget.hbs  # Widget que renderiza el valor de la UF
+        │   └── alert.hbs      # Alerta de error/éxito reutilizable, auto-descartable vía Alpine.js
         ├── auth/
         │   ├── login.hbs      # Formulario de inicio de sesión
         │   └── registro.hbs   # Formulario de registro
@@ -121,10 +124,16 @@ El sistema integra dos componentes funcionales principales:
 5. **Lectura de JWT:**
    - Prioridad 1: Cookie `token` (enviada automáticamente por el navegador).
    - Prioridad 2 (Fallback): Header `Authorization: Bearer <token>` (facilita pruebas con Postman/cURL).
-6. **Vistas Handlebars Limpias (Logic-less):**
+6. **Nav consciente de la sesión (`cargarUsuario`):**
+   - `cargarUsuario` (registrado globalmente en `app.ts`, antes de las rutas) decodifica el JWT si existe y expone el payload en `res.locals.usuario`, sin redirigir si falta o es inválido — a diferencia de `verificarToken`, nunca bloquea la request.
+   - `layouts/main.hbs` usa `{{#if usuario}}` para mostrar "Proyectos/Nuevo proyecto/Cerrar sesión" solo si hay sesión, y "Iniciar sesión/Registrarse" en caso contrario.
+7. **Vistas Handlebars Limpias (Logic-less):**
    - No colocar lógica de negocio en plantillas `.hbs`. Formatos (`formatFecha`, `formatMonto`) y comparaciones (`eq`) deben resolverse mediante los helpers registrados en `src/app.ts`.
-7. **Estilos Tailwind:**
-   - Usar solo clases utilitarias en el marcado HTML de los `.hbs`. Nunca modificar `public/css/styles.css` a mano.
+8. **Estilos Tailwind:**
+   - Usar clases utilitarias en el marcado HTML de los `.hbs`. Nunca modificar `public/css/styles.css` a mano.
+   - Excepción sancionada: clases de componente en `src/styles/input.css` bajo `@layer components` (`.btn-primary`, `.btn-secondary`, `.btn-danger`, `.btn-icon`, `.card`, `.badge`, `.input-field`) para evitar repetir strings largos de utilidades en las 8 vistas. No agregar CSS custom fuera de ese layer sin justificarlo.
+9. **Alpine.js — uso mínimo, sin lógica de negocio:**
+   - Reservado para: menú móvil (`main.hbs`) y auto-cierre de alertas (`partials/alert.hbs`). Cualquier nueva interacción de UI puede sumarse ahí; datos/validaciones/reglas de negocio siguen resolviéndose en el backend, nunca en `x-data`.
 
 ---
 
@@ -134,7 +143,7 @@ El sistema integra dos componentes funcionales principales:
 - **Problema:** `tsc` solo compila archivos TypeScript a `dist/`; no copia archivos estáticos ni plantillas `.hbs`.
 - **Solución implementada:** El script de build en `package.json` incluye la copia explícita de vistas:
   ```json
-  "build": "pnpm build:css && tsc && cp -r src/views dist/views"
+  "build": "pnpm build:js && pnpm build:css && tsc && cp -r src/views dist/views"
   ```
 
 ### B. Versión de Tailwind CSS (v3 vs v4)
@@ -179,6 +188,10 @@ El sistema integra dos componentes funcionales principales:
 - **Problema:** En WSL2 + Docker Desktop, si un proceso corre en el host (ej. `pnpm dev` con `ts-node-dev`) ocupando el puerto 3000 mientras `docker compose up` intenta publicar el mismo puerto del contenedor `app`, el forwarding de Docker Desktop puede quedar en mal estado: el contenedor arranca "healthy" pero `curl localhost:3000` da `Connection refused` o —peor— responde el proceso host viejo con env vars obsoletas cacheadas en memoria.
 - **Solución implementada:** Antes de `docker compose up`, verificar que no haya un `pnpm dev`/`ts-node-dev` corriendo en el host sobre el mismo puerto (`ps aux | grep ts-node-dev`). Si el puerto quedó en mal estado tras matar el proceso host, `docker compose restart app` para que Docker Desktop vuelva a publicar el puerto limpio.
 
+### I. Alpine.js se vendoriza, no se sirve desde CDN
+- **Problema:** Cargar Alpine.js desde un CDN externo agrega una dependencia de red en tiempo de ejecución (rompe uso offline, y en Docker es una llamada externa evitable).
+- **Solución implementada:** `pnpm add alpinejs` como dependencia, y el script `build:js` copia `alpinejs/dist/cdn.min.js` a `public/js/alpine.min.js` (mismo patrón que Tailwind CLI → `public/css/styles.css`). `build:js` corre antes de `dev` y `build`, así que `pnpm build` (usado por el `Dockerfile`) sigue siendo el único punto de entrada — no hace falta tocar `Dockerfile`/`docker-compose.yml`. Si se agrega o actualiza `alpinejs`, correr `pnpm build:js` para refrescar el bundle vendorizado.
+
 ---
 
 ## ⚡ 6. Comandos del Proyecto
@@ -199,6 +212,9 @@ pnpm dev:css
 
 # Compilar CSS para producción
 pnpm build:css
+
+# Vendorizar Alpine.js a public/js/alpine.min.js (se corre sola al inicio de `dev`/`build`)
+pnpm build:js
 
 # Build completo de producción (CSS + TypeScript + Copia de vistas)
 pnpm build

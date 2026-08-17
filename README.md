@@ -56,12 +56,13 @@ El proyecto integra gestión de proyectos, consulta de servicios externos en tie
 | **Entorno** | `dotenv` | Gestión de variables de entorno locales. |
 | **ORM / Base de Datos** | [Prisma](https://www.prisma.io/) (v7.x) + **PostgreSQL** | Persistencia real de `Usuario` y `Proyecto`, migraciones versionadas en `prisma/migrations`. |
 | **Contenedores** | Docker + Docker Compose | Servicios `app` (Node) y `db` (PostgreSQL) orquestados con `docker-compose.yml`. |
+| **Interactividad Cliente** | [Alpine.js](https://alpinejs.dev/) (v3.x) | Auto-hospedado (`public/js/alpine.min.js`, vendorizado por `pnpm build:js`, sin CDN). Solo para menú móvil y alertas auto-descartables. |
 
 ### ¿Por qué este stack?
 
 Es un stack coherente para un CRUD con autenticación: Express + Handlebars (SSR) evita la complejidad de un frontend SPA, TypeScript da seguridad de tipos, y Prisma + PostgreSQL + Docker aportan persistencia real y un entorno reproducible con un solo comando — piezas maduras y bien documentadas, sin nada exótico.
 
-**Trade-off principal:** al ser SSR con Handlebars, cada acción (crear, editar, eliminar) recarga la página completa; no hay actualizaciones parciales sin JavaScript adicional. Para el alcance de este proyecto (CRUD + auth) es una ventaja de simplicidad, no una limitación. Si en el futuro se necesita UX más dinámica, conviene evaluar algo ligero como HTMX o `fetch` + fragmentos antes de saltar a un framework SPA completo.
+**Trade-off principal:** al ser SSR con Handlebars, cada acción (crear, editar, eliminar) recarga la página completa; no hay actualizaciones parciales sin JavaScript adicional. Para el alcance de este proyecto (CRUD + auth) es una ventaja de simplicidad, no una limitación. Para el puñado de interacciones que sí lo pedían (menú móvil responsivo, alertas que se auto-cierran) se sumó Alpine.js de forma mínima en vez de saltar a un framework SPA completo.
 
 ---
 
@@ -75,8 +76,10 @@ proyecto_web/
 │   ├── schema.prisma            # Modelos Usuario y Proyecto (Prisma ORM)
 │   └── migrations/              # Historial de migraciones SQL versionado
 ├── public/
-│   └── css/
-│       └── styles.css          # CSS compilado por Tailwind (generado)
+│   ├── css/
+│   │   └── styles.css          # CSS compilado por Tailwind (generado)
+│   └── js/
+│       └── alpine.min.js       # Alpine.js vendorizado por `pnpm build:js` (generado)
 ├── dist/                       # Salida compilada a JavaScript para producción
 ├── src/
 │   ├── config/
@@ -87,7 +90,7 @@ proyecto_web/
 │   │   ├── auth.controller.ts  # Controladores de registro, login y logout
 │   │   └── proyecto.controller.ts # Controladores del CRUD de proyectos
 │   ├── middlewares/
-│   │   └── auth.middleware.ts  # Middleware verificarToken (JWT en cookie/header)
+│   │   └── auth.middleware.ts  # verificarToken (protege rutas) + cargarUsuario (sesión disponible en las vistas)
 │   ├── models/
 │   │   ├── usuario.model.ts    # CRUD async sobre `prisma.usuario`
 │   │   └── proyecto.model.ts   # CRUD async sobre `prisma.proyecto`
@@ -97,16 +100,17 @@ proyecto_web/
 │   ├── services/
 │   │   └── uf.service.ts       # Servicio que consume la API de mindicador.cl
 │   ├── styles/
-│   │   └── input.css           # Entrada de directivas Tailwind (@tailwind base, ...)
+│   │   └── input.css           # Tailwind + @layer components (.btn-primary, .card, .badge, .input-field...)
 │   ├── types/
 │   │   ├── usuario.d.ts        # Interface IUsuario
 │   │   ├── proyecto.d.ts       # Interface IProyecto
 │   │   └── express.d.ts        # Extensión de tipos de Express.Request con usuario
 │   ├── views/
 │   │   ├── layouts/
-│   │   │   └── main.hbs        # Layout principal (HTML5, Navbar, Footer)
+│   │   │   └── main.hbs        # Layout principal: header con nav responsivo (menú móvil vía Alpine.js) y footer
 │   │   ├── partials/
-│   │   │   └── uf-widget.hbs   # Widget que muestra el valor de la UF
+│   │   │   ├── uf-widget.hbs   # Widget que muestra el valor de la UF
+│   │   │   └── alert.hbs       # Alerta de error/éxito reutilizable, auto-descartable
 │   │   ├── auth/
 │   │   │   ├── login.hbs       # Vista de inicio de sesión
 │   │   │   └── registro.hbs    # Vista de registro de usuarios
@@ -193,6 +197,7 @@ proyecto_web/
 | `pnpm dev:server` | Inicia únicamente el servidor Express en modo desarrollo. |
 | `pnpm dev:css` | Inicia únicamente el watcher de Tailwind CSS. |
 | `pnpm build:css` | Compila y minifica el archivo CSS para producción. |
+| `pnpm build:js` | Vendoriza Alpine.js a `public/js/alpine.min.js` (corre sola al inicio de `dev`/`build`). |
 | `pnpm build` | Compila CSS, transpila TypeScript a `dist/` y copia las plantillas `.hbs` a `dist/views`. |
 | `pnpm start` | Inicia la aplicación en **modo producción** desde `dist/server.js`. |
 | `pnpm exec tsc --noEmit` | Ejecuta el chequeo estático de tipos sin compilar archivos. |
