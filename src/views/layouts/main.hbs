@@ -6,74 +6,137 @@
   <title>Tech Solutions · Gestión de Proyectos</title>
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
-<body class="bg-slate-50 min-h-screen flex flex-col">
-  <header class="sticky top-0 z-10 bg-gradient-to-r from-indigo-700 to-violet-700 text-white shadow-md" x-data="{ open: false }">
-    <nav class="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
-      <a href="/proyectos" class="flex items-center gap-2 font-bold text-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<body class="bg-slate-50 min-h-screen">
+  {{#if usuario}}
+  <div class="flex min-h-screen" x-data="{ open: false }">
+    <!-- Sidebar: fija en escritorio -->
+    <aside class="hidden md:flex md:flex-col md:w-64 md:shrink-0 bg-gradient-to-b from-indigo-700 to-violet-800 text-white">
+      <a href="/proyectos" class="flex items-center gap-2 font-bold text-lg px-5 py-5">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
         Tech Solutions
       </a>
+      <nav class="flex-1 flex flex-col gap-1 px-3 text-sm">
+        <a href="/proyectos" class="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/15 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Proyectos
+        </a>
+        <a href="/proyectos/nuevo" class="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/15 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Nuevo proyecto
+        </a>
+      </nav>
+      <a href="/logout" class="flex items-center gap-2 px-5 py-4 text-sm border-t border-white/10 hover:bg-red-500/80 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        Cerrar sesión
+      </a>
+    </aside>
 
-      <div class="hidden md:flex items-center gap-1 text-sm">
-        {{#if usuario}}
-          <a href="/proyectos" class="px-3 py-1.5 rounded-full hover:bg-white/15 transition">Proyectos</a>
-          <a href="/proyectos/nuevo" class="px-3 py-1.5 rounded-full hover:bg-white/15 transition">Nuevo proyecto</a>
-          <a href="/logout" class="px-3 py-1.5 rounded-full hover:bg-red-500/80 transition">Cerrar sesión</a>
-        {{else}}
+    <!-- Sidebar: off-canvas en mobile -->
+    <div class="md:hidden fixed inset-0 z-20" x-show="open" x-cloak>
+      <div class="absolute inset-0 bg-black/50" @click="open = false" x-transition.opacity></div>
+      <aside
+        class="relative flex flex-col w-64 h-full bg-gradient-to-b from-indigo-700 to-violet-800 text-white"
+        x-show="open"
+        x-transition:enter="transition ease-out duration-150"
+        x-transition:enter-start="-translate-x-full"
+        x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition ease-in duration-100"
+        x-transition:leave-start="translate-x-0"
+        x-transition:leave-end="-translate-x-full"
+      >
+        <a href="/proyectos" class="flex items-center gap-2 font-bold text-lg px-5 py-5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Tech Solutions
+        </a>
+        <nav class="flex-1 flex flex-col gap-1 px-3 text-sm">
+          <a href="/proyectos" class="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/15 transition" @click="open = false">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Proyectos
+          </a>
+          <a href="/proyectos/nuevo" class="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/15 transition" @click="open = false">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Nuevo proyecto
+          </a>
+        </nav>
+        <a href="/logout" class="flex items-center gap-2 px-5 py-4 text-sm border-t border-white/10 hover:bg-red-500/80 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Cerrar sesión
+        </a>
+      </aside>
+    </div>
+
+    <div class="flex-1 flex flex-col min-w-0">
+      <header class="md:hidden sticky top-0 z-10 bg-gradient-to-r from-indigo-700 to-violet-700 text-white shadow-md flex items-center justify-between px-4 py-3">
+        <a href="/proyectos" class="flex items-center gap-2 font-bold text-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Tech Solutions
+        </a>
+        <button
+          type="button"
+          class="inline-flex items-center justify-center rounded-lg p-2 hover:bg-white/15 transition"
+          @click="open = !open"
+          :aria-expanded="open"
+          aria-label="Abrir menú"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </header>
+
+      <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-6">
+        {{{body}}}
+      </main>
+
+      <footer class="border-t border-slate-200 text-slate-400 text-center text-xs py-4">
+        &copy; Tech Solutions — Proyecto académico
+      </footer>
+    </div>
+  </div>
+  {{else}}
+  <div class="flex flex-col min-h-screen">
+    <header class="sticky top-0 z-10 bg-gradient-to-r from-indigo-700 to-violet-700 text-white shadow-md">
+      <nav class="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
+        <a href="/login" class="flex items-center gap-2 font-bold text-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Tech Solutions
+        </a>
+        <div class="flex items-center gap-1 text-sm">
           <a href="/login" class="px-3 py-1.5 rounded-full hover:bg-white/15 transition">Iniciar sesión</a>
           <a href="/registro" class="px-3 py-1.5 rounded-full hover:bg-white/15 transition">Registrarse</a>
-        {{/if}}
-      </div>
+        </div>
+      </nav>
+    </header>
 
-      <button
-        type="button"
-        class="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-white/15 transition"
-        @click="open = !open"
-        :aria-expanded="open"
-        aria-label="Abrir menú"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" x-show="!open">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" x-show="open" x-cloak>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </nav>
+    <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-6">
+      {{{body}}}
+    </main>
 
-    <div
-      class="md:hidden overflow-hidden"
-      x-show="open"
-      x-cloak
-      x-transition:enter="transition ease-out duration-150"
-      x-transition:enter-start="opacity-0 -translate-y-2"
-      x-transition:enter-end="opacity-100 translate-y-0"
-      x-transition:leave="transition ease-in duration-100"
-      x-transition:leave-start="opacity-100 translate-y-0"
-      x-transition:leave-end="opacity-0 -translate-y-2"
-    >
-      <div class="flex flex-col gap-1 px-4 pb-3 text-sm">
-        {{#if usuario}}
-          <a href="/proyectos" class="rounded-lg px-3 py-2 hover:bg-white/15 transition">Proyectos</a>
-          <a href="/proyectos/nuevo" class="rounded-lg px-3 py-2 hover:bg-white/15 transition">Nuevo proyecto</a>
-          <a href="/logout" class="rounded-lg px-3 py-2 hover:bg-red-500/80 transition">Cerrar sesión</a>
-        {{else}}
-          <a href="/login" class="rounded-lg px-3 py-2 hover:bg-white/15 transition">Iniciar sesión</a>
-          <a href="/registro" class="rounded-lg px-3 py-2 hover:bg-white/15 transition">Registrarse</a>
-        {{/if}}
-      </div>
-    </div>
-  </header>
-
-  <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6">
-    {{{body}}}
-  </main>
-
-  <footer class="border-t border-white/10 bg-gradient-to-r from-indigo-900 to-violet-900 text-slate-300 text-center text-xs py-4">
-    &copy; Tech Solutions — Proyecto académico
-  </footer>
+    <footer class="border-t border-white/10 bg-gradient-to-r from-indigo-900 to-violet-900 text-slate-300 text-center text-xs py-4">
+      &copy; Tech Solutions — Proyecto académico
+    </footer>
+  </div>
+  {{/if}}
 
   <script src="/js/alpine.min.js" defer></script>
 </body>
