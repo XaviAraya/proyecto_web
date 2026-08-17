@@ -22,3 +22,19 @@ export function verificarToken(req: Request, res: Response, next: NextFunction):
     res.redirect('/login');
   }
 }
+
+export function cargarUsuario(req: Request, res: Response, next: NextFunction): void {
+  const cookieToken = req.cookies?.token as string | undefined;
+
+  if (cookieToken) {
+    try {
+      const payload = jwt.verify(cookieToken, process.env.JWT_SECRET as string) as JwtPayload;
+      req.usuario = payload;
+      res.locals.usuario = payload;
+    } catch {
+      // Sesión inválida o expirada: se ignora, la vista se renderiza como usuario anónimo.
+    }
+  }
+
+  next();
+}

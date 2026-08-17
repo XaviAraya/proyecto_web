@@ -4,11 +4,12 @@
   "private": true,
   "main": "dist/server.js",
   "scripts": {
-    "dev": "concurrently -n SERVER,CSS -c blue,green \"pnpm dev:server\" \"pnpm dev:css\"",
+    "dev": "pnpm build:js && concurrently -n SERVER,CSS -c blue,green \"pnpm dev:server\" \"pnpm dev:css\"",
     "dev:server": "ts-node-dev --respawn --transpile-only src/server.ts",
     "dev:css": "tailwindcss -i ./src/styles/input.css -o ./public/css/styles.css --watch",
     "build:css": "tailwindcss -i ./src/styles/input.css -o ./public/css/styles.css --minify",
-    "build": "pnpm build:css && tsc && cp -r src/views dist/views",
+    "build:js": "node -e \"require('fs').copyFileSync(require.resolve('alpinejs/dist/cdn.min.js'), 'public/js/alpine.min.js')\"",
+    "build": "pnpm build:js && pnpm build:css && tsc && cp -r src/views dist/views",
     "start": "node dist/server.js"
   },
   "packageManager": "pnpm@10.33.4",
@@ -23,6 +24,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
+    "alpinejs": "^3.16.1",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",

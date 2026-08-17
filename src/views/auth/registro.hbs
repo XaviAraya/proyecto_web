@@ -1,32 +1,38 @@
-<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
-  <h1 class="text-xl font-bold mb-4">Crear cuenta</h1>
+<div class="grid md:grid-cols-2 rounded-2xl shadow-sm overflow-hidden border border-slate-100 max-w-3xl mx-auto">
+  <div class="hidden md:flex flex-col justify-center gap-3 bg-gradient-to-br from-indigo-600 to-violet-700 text-white p-8">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+    <h2 class="text-2xl font-bold">Únete a Tech Solutions</h2>
+    <p class="text-indigo-100 text-sm">Crea tu cuenta y empieza a gestionar tus proyectos hoy mismo.</p>
+  </div>
 
-  {{#if error}}
-    <div class="mb-4 rounded bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-sm">{{error}}</div>
-  {{/if}}
-  {{#if exito}}
-    <div class="mb-4 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-2 text-sm">{{exito}}</div>
-  {{/if}}
+  <div class="bg-white p-6 sm:p-8">
+    <h1 class="text-xl font-bold text-slate-800 mb-4">Crear cuenta</h1>
 
-  <form method="POST" action="/registro" class="space-y-4">
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Nombre</label>
-      <input type="text" name="nombre" required class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Correo</label>
-      <input type="email" name="correo" required class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Clave</label>
-      <input type="password" name="clave" required minlength="6" class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" />
-    </div>
-    <button type="submit" class="w-full bg-slate-900 text-white rounded py-2 font-medium hover:bg-slate-700 transition">
-      Registrarme
-    </button>
-  </form>
+    {{#if error}}{{> alert type="error" message=error}}{{/if}}
+    {{#if exito}}{{> alert type="exito" message=exito}}{{/if}}
 
-  <p class="mt-4 text-sm text-gray-600 text-center">
-    ¿Ya tienes cuenta? <a href="/login" class="text-emerald-600 font-medium hover:underline">Inicia sesión</a>
-  </p>
+    <form method="POST" action="/registro" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Nombre</label>
+        <input type="text" name="nombre" required class="input-field" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Correo</label>
+        <input type="email" name="correo" required class="input-field" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Clave</label>
+        <input type="password" name="clave" required minlength="6" class="input-field" />
+      </div>
+      <button type="submit" class="btn-primary w-full">
+        Registrarme
+      </button>
+    </form>
+
+    <p class="mt-4 text-sm text-slate-600 text-center">
+      ¿Ya tienes cuenta? <a href="/login" class="text-indigo-600 font-medium hover:underline">Inicia sesión</a>
+    </p>
+  </div>
 </div>

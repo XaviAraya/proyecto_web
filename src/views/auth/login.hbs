@@ -1,25 +1,47 @@
-<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
-  <h1 class="text-xl font-bold mb-4">Iniciar sesión</h1>
+<div class="grid md:grid-cols-2 rounded-2xl shadow-sm overflow-hidden border border-slate-100 max-w-3xl mx-auto">
+  <div class="hidden md:flex flex-col justify-center gap-3 bg-gradient-to-br from-indigo-600 to-violet-700 text-white p-8">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+    <h2 class="text-2xl font-bold">Bienvenido de vuelta</h2>
+    <p class="text-indigo-100 text-sm">Gestiona tus proyectos, todo en un solo lugar.</p>
+  </div>
 
-  {{#if error}}
-    <div class="mb-4 rounded bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-sm">{{error}}</div>
-  {{/if}}
+  <div class="bg-white p-6 sm:p-8">
+    <h1 class="text-xl font-bold text-slate-800 mb-4">Iniciar sesión</h1>
 
-  <form method="POST" action="/login" class="space-y-4">
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Correo</label>
-      <input type="email" name="correo" required class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Clave</label>
-      <input type="password" name="clave" required class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" />
-    </div>
-    <button type="submit" class="w-full bg-slate-900 text-white rounded py-2 font-medium hover:bg-slate-700 transition">
-      Ingresar
-    </button>
-  </form>
+    {{#if error}}{{> alert type="error" message=error}}{{/if}}
 
-  <p class="mt-4 text-sm text-gray-600 text-center">
-    ¿No tienes cuenta? <a href="/registro" class="text-emerald-600 font-medium hover:underline">Regístrate</a>
-  </p>
+    <form method="POST" action="/login" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Correo</label>
+        <div class="relative mt-1">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </span>
+          <input type="email" name="correo" required class="input-field pl-9 mt-0" />
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Clave</label>
+        <div class="relative mt-1">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </span>
+          <input type="password" name="clave" required class="input-field pl-9 mt-0" />
+        </div>
+      </div>
+      <button type="submit" class="btn-primary w-full">
+        Ingresar
+      </button>
+    </form>
+
+    <p class="mt-4 text-sm text-slate-600 text-center">
+      ¿No tienes cuenta? <a href="/registro" class="text-indigo-600 font-medium hover:underline">Regístrate</a>
+    </p>
+  </div>
 </div>

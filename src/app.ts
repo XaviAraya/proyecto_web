@@ -7,6 +7,7 @@ import { engine } from 'express-handlebars';
 
 import authRoutes from './routes/auth.routes';
 import proyectoRoutes from './routes/proyecto.routes';
+import { cargarUsuario } from './middlewares/auth.middleware';
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.use(
   }),
 );
 app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(cargarUsuario);
 
 app.get('/', (_req, res) => res.redirect('/proyectos'));
 
